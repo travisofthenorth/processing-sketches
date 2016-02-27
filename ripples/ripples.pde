@@ -4,7 +4,7 @@ int lastIndex;
 
 void setup()
 {
-  size(500,500);
+  size(300,300);
   ripple = new int[width*height*2];
   background(255);
   
@@ -39,12 +39,7 @@ void drawRipples()
   updatePixels();
 }
 
-void mouseReleased()
-{
-  createRipple(mouseX, mouseY);
-}
-
-void mouseDragged()
+void mouseMoved()
 {
   createRipple(mouseX, mouseY);
 }
