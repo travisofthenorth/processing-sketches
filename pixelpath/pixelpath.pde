@@ -1,5 +1,25 @@
 PImage img;
 ArrayList<Pixel> movingPixels;
+int lastMouseX, lastMouseY;
+
+//final ArrayList<String> directions = new ArrayList<String>() {{
+//  add("n"); add("s"); add("e"); add("w"); add("ne"); add("nw"); add("se"); add("sw");
+//}};
+final ArrayList<String> directions = new ArrayList<String>() {{
+  add("n"); add("s"); add("e"); add("w");
+}};
+final ArrayList<String> left = new ArrayList<String>() {{
+  add("e"); add("ne"); add("se");
+}};
+final ArrayList<String> right = new ArrayList<String>() {{
+  add("w"); add("nw"); add("sw");
+}};
+final ArrayList<String> up = new ArrayList<String>() {{
+  add("n"); add("ne"); add("nw");
+}};
+final ArrayList<String> down = new ArrayList<String>() {{
+  add("s"); add("se"); add("sw");
+}};
 
 void setup()
 {
@@ -11,8 +31,13 @@ void setup()
 void draw()
 { 
   loadPixels();
-  for (Pixel pixel: movingPixels) {
-    pixel.update();
+  for (int i = movingPixels.size() - 1; i >= 0; i--) {
+    Pixel pixel = movingPixels.get(i);
+    pixel.update(millis());
+    
+    if (pixel.dead()) {
+      movingPixels.remove(i);
+    }
   }
   updatePixels();
 }
@@ -35,15 +60,39 @@ void mouseMoved()
   
   for (int x = mouseX - 5; x <= mouseX + 5; x++) {
     for (int y = mouseY - 5; y <= mouseY + 5; y++) {
-      createPixel(x, y);
+      if (!outOfBounds(x, y)) {
+        Pixel pixel = new Pixel(x, y);
+//        
+//        if (mouseX != 0 && mouseY != 0) {
+//          int dx = mouseX - lastMouseX;
+//          int dy = mouseY - lastMouseY;
+//          
+//          int velocity = int(sqrt(dx*dx + dy*dy));
+//          velocity = min(velocity, 4);
+//          pixel.setVelocity(velocity*100);
+//          
+//          if (abs(dx) > abs(dy)) {
+//            if (dx < 0) {
+//              pixel.setDirection(randomItem(left));
+//            } else {
+//              pixel.setDirection(randomItem(right));
+//            }
+//          } else if (abs(dy) > abs(dx)) {
+//            if (dy < 0) {
+//              pixel.setDirection(randomItem(up));
+//            } else {
+//              pixel.setDirection(randomItem(down));
+//            }
+//          }
+//        }
+        
+        movingPixels.add(pixel);
+      }
     }
   }
-}
-
-void createPixel(int x, int y) {
-  if (!outOfBounds(x, y)) {
-    movingPixels.add(new Pixel(x, y));
-  }
+  
+  lastMouseX = mouseX;
+  lastMouseY = mouseY;
 }
 
 boolean outOfBounds(int px, int py) {
@@ -54,19 +103,58 @@ boolean outOfBounds(int px, int py) {
   return false;
 }
 
+String randomItem(ArrayList<String> list) {
+  int rdmIndex = (int)random(list.size());
+  return list.get(rdmIndex);
+}
+
 class Pixel { 
-  private final String [] directions = {"up", "down", "left", "right"};
-  
   private String direction;
   private int posx, posy;
+  private int velocity;
   
   Pixel (int px, int py) {  
     posx = px;
     posy = py;
-    setDirection();
+    velocity = 300;
+    changeDirection();
   }
   
-  void update() { 
+  void setVelocity(int v) {
+    velocity = v;
+  }
+  
+  void setDirection(String d) {
+    direction = d;
+  }
+  
+  void update(int currentTime) {
+    for(int i = 0; i < int(velocity/100); i++) {
+      move();
+    }
+    
+    if (shouldMoveAgain()) {
+      move();
+    }
+
+    velocity--;
+  } 
+  
+  boolean dead() {
+    return velocity == 0;
+  }
+  
+  private boolean shouldMoveAgain() {
+    int remainder = velocity % 100;
+    
+    if (remainder > 0) {
+      return int(random(0, 100-remainder)) < 10;
+    }
+    
+    return false;
+  }
+  
+  private void move() {
     int newx = posx + dx();
     int newy = posy + dy();
     
@@ -78,55 +166,58 @@ class Pixel {
     }
    
     if ((int)random(100) == 1) {
-      setDirection();
+      changeDirection();
     }
       
     posx = newx;
     posy = newy;
     fixPosX();
     fixPosY();
-  } 
+  }
   
-  private void setDirection() {
+  private void changeDirection() {
     String newDirection = direction;
     
     while (direction == newDirection) {
-      int rdmIndex = (int) random(4);
-      newDirection = directions[rdmIndex];
+      newDirection = randomItem(directions);
     }
     
     direction = newDirection;
   }
     
   private int dx() {
-    if (direction == "left")
+    if (left.contains(direction))
       return -1;
-    if (direction == "right")
+    if (right.contains(direction))
       return 1;
     return 0;
   }
   
   private int dy() {
-    if (direction == "up")
+    if (up.contains(direction))
       return -1;
-    if (direction == "down")
+    if (down.contains(direction))
       return 1;
     return 0;
   }
   
   private void fixPosX() {
-    if (posx <= 0 && direction == "left") {
-      posx = width - 1;
-    } else if (posx >= width - 1 && direction == "right") {
+    if (posx <= 0 && left.contains(direction)) {
       posx = 0;
+      changeDirection();
+    } else if (posx >= width - 1 && right.contains(direction)) {
+      posx = width - 1;
+      changeDirection();
     }
   }
   
   private void fixPosY() {
-    if (posy <= 0 && direction == "up") {
-      posy = height - 1;
-    } else if (posy >= height - 1 && direction == "down") {
+    if (posy <= 0 && up.contains(direction)) {
       posy = 0;
+      changeDirection();
+    } else if (posy >= height - 1 && down.contains(direction)) {
+      posy = height - 1;
+      changeDirection();
     }
   }
   
