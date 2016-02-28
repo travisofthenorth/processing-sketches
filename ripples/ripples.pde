@@ -10,8 +10,9 @@ void setup()
   
   index = 0;
   lastIndex = width*height;
-  for(int i = 0; i < width*height*2; i++)
+  for(int i = 0; i < width*height*2; i++) {
     ripple[i] = 0;
+  }
 }
 
 void draw()
@@ -24,16 +25,21 @@ void draw()
 }
 
 void drawRipples()
-{
-  color white = color(255, 255, 255);
+{ 
+  color white = color(255);
   loadPixels();
   for(int x = 1; x < width-1; x++) {
     for(int y = 1; y < height-1; y++) {
       int i = y*width + x;
       int s = i + index;
-      int dx = (ripple[s-1] - ripple[s+1]) / 4;
-      int dy = (ripple[s-width] - ripple[s+width]) / 4;
-      pixels[i] = blendColor(white,color(4*dx,4*dx,4*dx),SUBTRACT);
+      int delta = (ripple[s-1] - ripple[s+1]) / 4;
+      
+      if (delta != 0) {
+        int c = 4 * delta;
+        pixels[i] = blendColor(white, color(c, c, c), SUBTRACT);
+      } else {
+        pixels[i] = white;
+      }
     }
   }
   updatePixels();
