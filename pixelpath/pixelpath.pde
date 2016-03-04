@@ -33,7 +33,7 @@ void draw()
   loadPixels();
   for (int i = movingPixels.size() - 1; i >= 0; i--) {
     Pixel pixel = movingPixels.get(i);
-    pixel.update(millis());
+    pixel.update();
     
     if (pixel.dead()) {
       movingPixels.remove(i);
@@ -61,32 +61,7 @@ void mouseMoved()
   for (int x = mouseX - 5; x <= mouseX + 5; x++) {
     for (int y = mouseY - 5; y <= mouseY + 5; y++) {
       if (!outOfBounds(x, y)) {
-        Pixel pixel = new Pixel(x, y);
-//        
-//        if (mouseX != 0 && mouseY != 0) {
-//          int dx = mouseX - lastMouseX;
-//          int dy = mouseY - lastMouseY;
-//          
-//          int velocity = int(sqrt(dx*dx + dy*dy));
-//          velocity = min(velocity, 4);
-//          pixel.setVelocity(velocity*100);
-//          
-//          if (abs(dx) > abs(dy)) {
-//            if (dx < 0) {
-//              pixel.setDirection(randomItem(left));
-//            } else {
-//              pixel.setDirection(randomItem(right));
-//            }
-//          } else if (abs(dy) > abs(dx)) {
-//            if (dy < 0) {
-//              pixel.setDirection(randomItem(up));
-//            } else {
-//              pixel.setDirection(randomItem(down));
-//            }
-//          }
-//        }
-        
-        movingPixels.add(pixel);
+        movingPixels.add(new Pixel(x, y));
       }
     }
   }
@@ -128,7 +103,7 @@ class Pixel {
     direction = d;
   }
   
-  void update(int currentTime) {
+  void update() {
     for(int i = 0; i < int(velocity/100); i++) {
       move();
     }
