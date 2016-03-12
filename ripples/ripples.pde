@@ -32,11 +32,10 @@ void drawRipples()
     for(int y = 1; y < height-1; y++) {
       int i = y*width + x;
       int s = i + index;
-      int delta = (ripple[s-1] - ripple[s+1]) / 4;
+      int delta = (ripple[s-1] - ripple[s+1]);
       
       if (delta != 0) {
-        int c = 4 * delta;
-        pixels[i] = blendColor(white, color(c, c, c), SUBTRACT);
+        pixels[i] = blendColor(white, color(delta, delta, delta), SUBTRACT);
       } else {
         pixels[i] = white;
       }
@@ -52,9 +51,9 @@ void mouseMoved()
 
 void createRipple(int mx, int my)
 {
-  for(int y = 0; y < height; y++) {
-    for(int x = 0; x < width; x++) {
-      if(x > mx-3 && x < mx+3 && y > my-3 && y < my+3)
+  for(int x = mx - 2; x < mx + 3; x++) {
+    for(int y = my - 2; y < my + 3; y++) {
+      if(x > 0 && x < width && y > 0 && y < height)
         ripple[y*width + x + index] = 512;
     }
   }
