@@ -1,7 +1,6 @@
 /* @pjs preload="bucky-small.png"; */
 PImage img;
 ArrayList<Pixel> movingPixels;
-int lastMouseX, lastMouseY;
 
 String [] directions = { "left", "right", "up", "down" };
 
@@ -49,9 +48,6 @@ void mouseMoved()
       }
     }
   }
-  
-  lastMouseX = mouseX;
-  lastMouseY = mouseY;
 }
 
 boolean outOfBounds(int px, int py) {
