@@ -1,29 +1,13 @@
+/* @pjs preload="bucky-small.png"; */
 PImage img;
 ArrayList<Pixel> movingPixels;
 int lastMouseX, lastMouseY;
 
-//final ArrayList<String> directions = new ArrayList<String>() {{
-//  add("n"); add("s"); add("e"); add("w"); add("ne"); add("nw"); add("se"); add("sw");
-//}};
-final ArrayList<String> directions = new ArrayList<String>() {{
-  add("n"); add("s"); add("e"); add("w");
-}};
-final ArrayList<String> left = new ArrayList<String>() {{
-  add("e"); add("ne"); add("se");
-}};
-final ArrayList<String> right = new ArrayList<String>() {{
-  add("w"); add("nw"); add("sw");
-}};
-final ArrayList<String> up = new ArrayList<String>() {{
-  add("n"); add("ne"); add("nw");
-}};
-final ArrayList<String> down = new ArrayList<String>() {{
-  add("s"); add("se"); add("sw");
-}};
+String [] directions = { "left", "right", "up", "down" };
 
 void setup()
 {
-  img = loadImage("bucky.png");
+  img = loadImage("bucky-small.png");
   size(img.width, img.height);
   reset();
 }
@@ -154,43 +138,44 @@ class Pixel {
     String newDirection = direction;
     
     while (direction == newDirection) {
-      newDirection = randomItem(directions);
+      int rdmIndex = (int) random(4);
+      newDirection = directions[rdmIndex];
     }
     
     direction = newDirection;
   }
     
   private int dx() {
-    if (left.contains(direction))
+    if (direction == "left")
       return -1;
-    if (right.contains(direction))
+    if (direction == "right")
       return 1;
     return 0;
   }
   
   private int dy() {
-    if (up.contains(direction))
+    if (direction == "up")
       return -1;
-    if (down.contains(direction))
+    if (direction == "down")
       return 1;
     return 0;
   }
   
   private void fixPosX() {
-    if (posx <= 0 && left.contains(direction)) {
+    if (posx <= 0 && direction == "left") {
       posx = 0;
       changeDirection();
-    } else if (posx >= width - 1 && right.contains(direction)) {
+    } else if (posx >= width - 1 && direction == "right") {
       posx = width - 1;
       changeDirection();
     }
   }
   
   private void fixPosY() {
-    if (posy <= 0 && up.contains(direction)) {
+    if (posy <= 0 && direction == "up") {
       posy = 0;
       changeDirection();
-    } else if (posy >= height - 1 && down.contains(direction)) {
+    } else if (posy >= height - 1 && direction == "down") {
       posy = height - 1;
       changeDirection();
     }
